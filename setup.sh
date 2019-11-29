@@ -8,21 +8,29 @@ case "$OS" in
   "Darwin") # Mac OS/OSX
     #==========================================================================
     #
-    #                         Operating System: macOS 
+    #                         Operating System: macOS
     #
     #==========================================================================
 
     # Functions
     # Check if a package is installed, if not install it.
-    brew_check_package () {
-        brew list $1 || brew install $1
+    brew_check_packages () {
+        echo "Checking "$#" packages..."
+        for package in $@
+        do
+            brew list "$package" || brew install "$package"
+        done
     }
 
     # Check if a cask app is installed, if not install it.
-    brew_check_caskapp () {
-        brew cask list $1 || brew cask install $1
+    brew_check_caskapps () {
+        echo "Checking "$#" cask apps..."
+        for app in $@
+        do
+            brew cask list "$app" || brew cask install "$app"
+        done
     }
-    
+
     # Install Homebrew Package Manager
     if ! command -v brew 1> /dev/null 2>&1 ; then
         ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/\
@@ -32,6 +40,9 @@ case "$OS" in
         brew doctor
     fi
 
+    # INSTALL OPTIONS
+    WITH_OVERRIDE_SYSTEM_VIM="-- --with-override-system-vim"
+
     # Install with brew cask: google-chrome, iterm2
     CASK_APPS="google-chrome iterm2"
     brew_check_caskapp "$CASK_APPS"
@@ -39,44 +50,38 @@ case "$OS" in
 
     # Install necessities:
     ESSENTIAL_PACKAGES="git bash bash-completion"
-    brew_check_package "$ESSENTIAL_PACKAGES"
+    brew_check_packages "$ESSENTIAL_PACKAGES"
 
     # Install ruby, perl, and python
-    brew install ruby perl
-    brew install python python3
-    
-    # Install GCC
-    # gcc is NOT linked here by brew. you must link or use 'gcc-6'
-    brew install gcc
-    brew install gdb 
-    brew install make --with-default-names
-    brew install automake autoconf
+    SCRIPTING_LANGUAGES="ruby perl python python3"
+    brew_check_packages "$SCRIPTING_LANGUAGES"
 
-    # Install GNU versions of general tools with Homebrew (with default names)
-    brew install coreutils binutils diffutils findutils --with-default-names 
-    brew install gnu-indent --with-default-names
-    brew install gnu-sed --with-default-names
-    brew install gnu-tar  --with-default-names
-    brew install gnu-which --with-default-names
-    brew install ed --with-default-names
-    brew install grep --with-default-names
-    brew install wdiff --with-gettext
-    brew install gawk gzip screen watch wget 
-        
+    # Install GCC
+    # Note: gcc is NOT linked here by brew. you must link or use 'gcc-6'
+    GCC_PACKAGES="gcc gdb make cmake automake autoconf"
+    brew_check_packages "$GCC_PACKAGES"
+
+    # Install GNU versions of general tools with Homebrew
+    # NOTE: Add PATH=/usr/local/opt/<package>/libexec/gnubin:$PATH
+    UTILS_PACKAGES="coreutils binutils diffutils findutils \
+                    gnu-indent gnu-sed gnu-tar gnu-which \
+                    gawk gzip screen watch wget ed grep wdiff tree"
+    brew_check_packages "$UTILS_PACKAGES"
+
     # Install MacVim with system override option
-    brew install macvim --with-override-system-vim
-    
+    brew list macvim || brew install macvim "$WITH_OVERRIDE_SYSTEM_VIM"
+
     # Install other cool tools
-    brew install graphviz --with-app doxygen --with=graphviz
-    brew install tree 
+    MISC_TOOLS="graphviz doxygen"
+    brew_check_packages "$MISC_TOOLS"
 
     # Install with PIP: numpy, scipy, matplotlib, ipython, jupyter, pySerial,
-    # nose, PEP8, 
-    pip install numpy scipy matplotlib 
-    pip install ipython[all] jupyter 
+    # nose, PEP8,
+    pip install numpy scipy matplotlib
+    pip install ipython[all] jupyter
     pip install pyserial nose
 
-    # Set up dot files from github repo
+    # TODO: Set up dot files from github repo
 
 
     ;;

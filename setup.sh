@@ -18,14 +18,6 @@ case "$OS" in
     # Make sure that was successful
     brew doctor
 
-    # Tap some stuff
-    brew tap caskroom/cask # for GUI applications
-    brew tap homebrew/dupes # for GNU tools
-    brew tap homebrew/completions
-    brew tap homebrew/versions
-
-    brew update
-
     # Install with brew cask: google-chrome, iterm2
     brew cask install google-chrome iterm2
 

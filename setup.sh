@@ -55,7 +55,8 @@ case "$OS" in
     brew install wdiff --with-gettext
     brew install gawk gzip screen watch wget 
         
-
+    # Install MacVim with system override option
+    brew install macvim --with-override-system-vim
     
     # Install other cool tools
     brew install graphviz --with-app doxygen --with=graphviz

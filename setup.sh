@@ -11,19 +11,35 @@ case "$OS" in
     #                         Operating System: macOS 
     #
     #==========================================================================
+
+    # Functions
+    # Check if a package is installed, if not install it.
+    brew_check_package () {
+        brew list $1 || brew install $1
+    }
+
+    # Check if a cask app is installed, if not install it.
+    brew_check_caskapp () {
+        brew cask list $1 || brew cask install $1
+    }
     
-    # Install Homebrew Package Manager (and Cask)
-    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/\
-                        install/master/install)"
-    # Make sure that was successful
-    brew doctor
+    # Install Homebrew Package Manager
+    if ! command -v brew 1> /dev/null 2>&1 ; then
+        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/\
+                   install/master/install)"
+
+        # Make sure install was successful
+        brew doctor
+    fi
 
     # Install with brew cask: google-chrome, iterm2
-    brew cask install google-chrome iterm2
+    CASK_APPS="google-chrome iterm2"
+    brew_check_caskapp "$CASK_APPS"
+    #brew cask list "$CASK_APPS" || brew cask install "$CASK_APPS"
 
     # Install necessities:
-    brew install git
-    brew install bash bash-completion
+    ESSENTIAL_PACKAGES="git bash bash-completion"
+    brew_check_package "$ESSENTIAL_PACKAGES"
 
     # Install ruby, perl, and python
     brew install ruby perl
@@ -61,6 +77,8 @@ case "$OS" in
     pip install pyserial nose
 
     # Set up dot files from github repo
+
+
     ;;
   "Linux") # Linux
     ;;
